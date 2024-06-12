@@ -176,11 +176,18 @@ document.addEventListener("DOMContentLoaded", function() {
         function populateRSSList() {
             const feeds = getRSSFeeds();
             rssList.innerHTML = '';
+            let option = document.createElement("option");
+            option.value = "";
+            option.hidden = true;
+            option.textContent = "Choose Feed to remove";
+            rssList.appendChild(option);
             feeds.forEach(feed => {
-                let option = document.createElement("option");
-                option.value = feed;
-                option.textContent = feed;
-                rssList.appendChild(option);
+                if (feed != DEFAULT_RSS_URL) {
+                    let option = document.createElement("option");
+                    option.value = feed;
+                    option.textContent = feed;
+                    rssList.appendChild(option);
+                }
             });
         }
 
