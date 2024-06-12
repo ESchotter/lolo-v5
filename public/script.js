@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const CLEAN_ARTICLE_ENDPOINT = '/clean-article';
     const DEFAULT_RSS_URL = '/rss-feed';
     const CUSTOM_RSS = "customRSSFeeds";
+    const CORS_PROXY = "/proxy-rss?url=";
     let articles = [];
 
     function getRSSFeeds() {
@@ -20,8 +21,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function fetchRSS(feedUrl) {
-        fetch(feedUrl)
-            .then(response => response.text())
+        if (feedUrl == DEFAULT_RSS_URL){
+            fetch(feedUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
             .then(data => {
                 let parser = new DOMParser();
                 let xmlDoc = parser.parseFromString(data, "text/xml");
@@ -30,10 +37,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 renderArticles();
             })
             .catch(error => console.log('Error fetching RSS feed:', error));
+        } else {
+            fetch(`${CORS_PROXY}${encodeURIComponent(feedUrl)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(data, "text/xml");
+                processRSS(xmlDoc);
+                renderCategories();
+                renderArticles();
+            })
+            .catch(error => console.log('Error fetching RSS feed:', error));
+        }
     }
 
-    async function processRSS(xmlDoc) {
+    function processRSS(xmlDoc) {
         const items = xmlDoc.getElementsByTagName("item");
+        const feedTitle = xmlDoc.getElementsByTagName("title")[0].textContent;
 
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
@@ -41,21 +66,25 @@ document.addEventListener("DOMContentLoaded", function() {
             let title = item.getElementsByTagName("title")[0].textContent;
             let description = item.getElementsByTagName("description")[0].textContent;
             let pubDate = new Date(item.getElementsByTagName("pubDate")[0].textContent);
+            let author = item.getElementsByTagName("author")[0].textContent;
             let category = item.getElementsByTagName("category")[0]?.textContent || 'Uncategorized';
 
-            let truncatedTitle = title.length > 64 ? title.substring(0, 64) + '...' : title;
+            let truncatedTitle = title.length > 57 ? title.substring(0, 57) + '...' : title;
+            let truncatedDescription = description.length > 160 ? title.substring(0, 160) + '...' : description;
 
             let mediaContent = item.getElementsByTagNameNS("*", "content")[0];
             let imageUrl = mediaContent ? mediaContent.getAttribute("url") : null;
 
 
             articles.push({
+                feedTitle,
                 title: truncatedTitle,
                 link,
-                description,
+                description: truncatedDescription,
                 pubDate,
                 category,
-                imageUrl
+                imageUrl,
+                author
             });
         }
 
@@ -133,6 +162,14 @@ document.addEventListener("DOMContentLoaded", function() {
             descriptionLink.target = "_blank";
             descriptionElement.appendChild(descriptionLink);
             articleElement.appendChild(descriptionElement);
+
+            let footerElement = document.createElement("footer");
+            footerElement.textContent = article.author + "   \uD83D\uDCC5 " + article.pubDate.toDateString();
+            articleElement.appendChild(footerElement);
+            
+            let pillElement = document.createElement("pill");
+            pillElement.textContent = article.feedTitle;
+            articleElement.appendChild(pillElement);
 
             articleElement.addEventListener("click", () => openModal(article.link));
             contentDiv.appendChild(articleElement);

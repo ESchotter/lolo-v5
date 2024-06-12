@@ -12,27 +12,37 @@ body {
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: #352d35;
     color: white;
     text-align: center;
     padding: 1em 0;
+    height: 130px;
     width: 100%;
     position: fixed;
     top: 0;
     left: 0;
 }
 
-header select {
+header h1{
     margin-top: 10px;
+    margin-bottom: 10px;
+}
 
+header select {
+    height: auto;
+    position: relative;
+    margin-top: 5px auto;
+    background-color: #817786;
+}
 
 #rss-management {
-    margin-top: 10px;
+    margin-top: 5px auto;
 }
 
 #rss-management input, #rss-management button, #rss-management select {
-    margin: 5px;
-}}
+    background-color: #817786;
+    margin: 5px auto;
+}
 
 main {
     display: grid;
@@ -40,9 +50,15 @@ main {
     gap: 20px;
     padding: 20px;
     width: 60%;
-    margin-top: 160px; /* Adjust this value if header height changes */
-    height: calc(100vh - 120px);
+    margin-top: 13vh; /* Adjust this value if header height changes */
+    height: 87vh;
     overflow-y: auto;
+}
+
+#content {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
 }
 
 article {
@@ -52,7 +68,8 @@ article {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc((100vh - 120px - 60px) / 3); /* Adjust for header and gap */
+    height: auto;
+    transform: scale(1);
 }
 
 article:hover {
@@ -68,21 +85,45 @@ article img {
 }
 
 article h2 {
+    text-size-adjust: auto;
     margin-top: 0;
     flex-grow: 1;
+    margin-bottom: 5px;
 }
 
 article a {
-    color: #4CAF50;
+    color: #020302;
     text-decoration: none;
     display: block;
-    margin: 10px 0;
+    margin-top: 0px;
+}
+
+article p {
+    margin-top: 0px;
+    margin-bottom: 10px;
 }
 
 article a:hover {
     text-decoration: underline;
 }
 
+article footer {
+    font-weight: bold;
+    margin-left: 20px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+article pill {
+    position: absolute;
+    top: 10%; 
+    left: 5%; 
+    background-color: #007bff; 
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
 
 .modal {
     display: none;
