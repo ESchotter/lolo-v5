@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const CLEAN_ARTICLE_ENDPOINT = 'https://uptime-mercury-api.azurewebsites.net/webparser';
+    const CLEAN_ARTICLE_ENDPOINT = '/clean-article';
     const DEFAULT_RSS_URL = '/rss-feed';
     const CUSTOM_RSS = "customRSSFeeds";
     let articles = [];
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.log('Error fetching RSS feed:', error));
     }
 
-    function processRSS(xmlDoc) {
+    async function processRSS(xmlDoc) {
         const items = xmlDoc.getElementsByTagName("item");
 
         for (let i = 0; i < items.length; i++) {
@@ -139,13 +139,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function openModal(url) {
+    async function openModal(url) {
         const modal = document.getElementById("article-modal");
         const modalBody = document.getElementById("modal-body");
 
         console.log(url);
 
-        let cleanedContent = fetchCleanedArticle(url);
+        let cleanedContent = await fetchCleanedArticle(url);
         modalBody.innerHTML = cleanedContent;
 
         modal.style.display = "flex";
